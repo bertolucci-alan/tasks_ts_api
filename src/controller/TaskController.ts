@@ -32,16 +32,12 @@ export const updateTasks = async (request: Request, response: Response) => {
 
 export const finishTasks = async (request: Request, response: Response) => {
     const { id } = request.params;
-    const task = await getRepository(Tasks).update(id, {
-        finish: true
+    const task = await getRepository(Tasks).findOneOrFail(id);
+    await getRepository(Tasks).update(id, {
+        finish: !task.finish
     });
+    return response.json({"task": task});
 
-    if(task.affected === 1) {
-        const taskFinish = await getRepository(Tasks).findOne(id);
-        return response.json({message: "Task finished" });
-    }
-
-    return response.json({"error": "Task not found!"}).status(404);
 }
 
 export const deleteTask = async (request: Request, response: Response) => {
